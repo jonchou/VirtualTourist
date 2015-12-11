@@ -10,12 +10,31 @@ import CoreData
 import UIKit
 import MapKit
 
-class TravelLocationMapViewController: UIViewController, MKMapViewDelegate {
+class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let pinDropGesture = UILongPressGestureRecognizer(target: self, action: "addPin:")
+        self.mapView.addGestureRecognizer(pinDropGesture)
+        
+        mapView.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {}
+    
+        fetchedResultsController.delegate = self
+        
+        // repopulate persisted pins
+        let pinArray = fetchedResultsController.fetchedObjects as! [Pin]
+        for pin in pinArray {
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = pin.coordinate
+            mapView.addAnnotation(annotation)
+        }
     }
     
     // MARK: - Core Data Convenience.
@@ -29,7 +48,7 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate {
         
         let fetchRequest = NSFetchRequest(entityName: "Pin")
         
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "latitude", ascending: true)]
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
             managedObjectContext: self.sharedContext,
@@ -40,7 +59,20 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate {
         
         }()
     
-    func addPin() {
+    func addPin(sender: UIGestureRecognizer) {
+        let annotation = MKPointAnnotation()
+        let point = sender.locationInView(mapView)
+        let coordinates = mapView.convertPoint(point, toCoordinateFromView: mapView)
+        annotation.coordinate = coordinates
+
+        
+        // beginning of gesture recognition
+        if sender.state == UIGestureRecognizerState.Began {
+            self.mapView.addAnnotation(annotation)
+            _ = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: sharedContext)
+            
+            CoreDataStackManager.sharedInstance().saveContext()
+        }
         
     }
     
