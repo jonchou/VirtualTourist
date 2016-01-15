@@ -104,6 +104,10 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         // Go to the next view controller
         let viewController = storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
         viewController.pin = view.annotation as! MKPointAnnotation
+        // need to deselect pin or else when coming back to vc can't reselect pin
+        mapView.deselectAnnotation(view.annotation, animated: false)
+        
+        // push next vc onto nav controller so that it transitions from the right and we can move back
         navigationController?.pushViewController(viewController, animated: true)
     }
     
