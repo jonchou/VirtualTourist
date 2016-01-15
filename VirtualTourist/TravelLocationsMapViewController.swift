@@ -29,12 +29,18 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         fetchedResultsController.delegate = self
         
         // repopulate persisted pins
+        restorePins()
+
+    }
+    
+    func restorePins() {
         let pinArray = fetchedResultsController.fetchedObjects as! [Pin]
         for pin in pinArray {
             let annotation = MKPointAnnotation()
             annotation.coordinate = pin.coordinate
             mapView.addAnnotation(annotation)
         }
+    
     }
     
     // MARK: - Core Data Convenience.
@@ -82,7 +88,7 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            pinView!.canShowCallout = true
+            pinView!.canShowCallout = false
             pinView!.pinTintColor = UIColor.redColor()
             pinView!.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure)
         } else {
@@ -90,6 +96,11 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         }
         
         return pinView
+    }
+    
+    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+        // Go to the next view controller
+        print("HELLO WORLD")
     }
     
     
