@@ -98,9 +98,13 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         return pinView
     }
     
+    
+    
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         // Go to the next view controller
-        print("HELLO WORLD")
+        let viewController = storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
+        viewController.pin = view.annotation as! MKPointAnnotation
+        navigationController?.pushViewController(viewController, animated: true)
     }
     
     

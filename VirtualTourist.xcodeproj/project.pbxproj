@@ -12,9 +12,10 @@
 		7B8EBBF81C1ACFFF004FE088 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B8EBBF61C1ACFFF004FE088 /* Main.storyboard */; };
 		7B8EBBFA1C1ACFFF004FE088 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B8EBBF91C1ACFFF004FE088 /* Assets.xcassets */; };
 		7B8EBBFD1C1ACFFF004FE088 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B8EBBFB1C1ACFFF004FE088 /* LaunchScreen.storyboard */; };
-		7B8EBC071C1AD201004FE088 /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8EBC061C1AD201004FE088 /* CoreDataStackManager.swift */; settings = {ASSET_TAGS = (); }; };
-		7B8EBC091C1AD3F0004FE088 /* TravelLocationsMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8EBC081C1AD3F0004FE088 /* TravelLocationsMapViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		7B8EBC0B1C1AD960004FE088 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8EBC0A1C1AD960004FE088 /* Pin.swift */; settings = {ASSET_TAGS = (); }; };
+		7B8EBC071C1AD201004FE088 /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8EBC061C1AD201004FE088 /* CoreDataStackManager.swift */; };
+		7B8EBC091C1AD3F0004FE088 /* TravelLocationsMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8EBC081C1AD3F0004FE088 /* TravelLocationsMapViewController.swift */; };
+		7B8EBC0B1C1AD960004FE088 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8EBC0A1C1AD960004FE088 /* Pin.swift */; };
+		7BBB6A761C48B52400BCE0B3 /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBB6A751C48B52400BCE0B3 /* PhotoAlbumViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		7B8EBC061C1AD201004FE088 /* CoreDataStackManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStackManager.swift; sourceTree = "<group>"; };
 		7B8EBC081C1AD3F0004FE088 /* TravelLocationsMapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravelLocationsMapViewController.swift; sourceTree = "<group>"; };
 		7B8EBC0A1C1AD960004FE088 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
+		7BBB6A751C48B52400BCE0B3 /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				7B8EBBED1C1ACFFE004FE088 /* AppDelegate.swift */,
 				7B8EBC061C1AD201004FE088 /* CoreDataStackManager.swift */,
 				7B8EBC081C1AD3F0004FE088 /* TravelLocationsMapViewController.swift */,
+				7BBB6A751C48B52400BCE0B3 /* PhotoAlbumViewController.swift */,
 				7B8EBC0A1C1AD960004FE088 /* Pin.swift */,
 				7B8EBBF61C1ACFFF004FE088 /* Main.storyboard */,
 				7B8EBBF91C1ACFFF004FE088 /* Assets.xcassets */,
@@ -149,6 +152,7 @@
 				7B8EBBF11C1ACFFF004FE088 /* VirtualTourist.xcdatamodeld in Sources */,
 				7B8EBBEE1C1ACFFE004FE088 /* AppDelegate.swift in Sources */,
 				7B8EBC071C1AD201004FE088 /* CoreDataStackManager.swift in Sources */,
+				7BBB6A761C48B52400BCE0B3 /* PhotoAlbumViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,6 +300,7 @@
 				7B8EBC031C1ACFFF004FE088 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
