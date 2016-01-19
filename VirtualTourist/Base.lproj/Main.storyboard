@@ -71,6 +71,7 @@
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="9BV-7g-7SS">
                                 <rect key="frame" x="20" y="108" width="560" height="472"/>
+                                <color key="backgroundColor" red="1" green="0.060231345866727404" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="MKk-Fi-voD">
                                     <size key="itemSize" width="50" height="50"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -78,16 +79,35 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="fFa-7V-noO">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="FlickrCell" id="fFa-7V-noO" customClass="FlickrCell" customModule="VirtualTourist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="O55-if-R74">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </imageView>
+                                            </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <color key="backgroundColor" red="0.047412989827864016" green="0.27559201953848911" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        <constraints>
+                                            <constraint firstItem="O55-if-R74" firstAttribute="leading" secondItem="fFa-7V-noO" secondAttribute="leadingMargin" constant="-8" id="Cu7-E0-6Lq"/>
+                                            <constraint firstAttribute="trailingMargin" secondItem="O55-if-R74" secondAttribute="trailing" constant="-8" id="Z3S-Yz-tGa"/>
+                                            <constraint firstAttribute="bottomMargin" secondItem="O55-if-R74" secondAttribute="bottom" constant="-8" id="hbH-jc-e2V"/>
+                                            <constraint firstItem="O55-if-R74" firstAttribute="top" secondItem="fFa-7V-noO" secondAttribute="topMargin" constant="-8" id="qwD-Wl-cPJ"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="FlickrCellImage" destination="O55-if-R74" id="2be-wV-NAM"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
+                                <connections>
+                                    <outlet property="dataSource" destination="cFd-sT-Gw0" id="wdV-eo-u8m"/>
+                                    <outlet property="delegate" destination="cFd-sT-Gw0" id="XZY-qn-GF9"/>
+                                </connections>
                             </collectionView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
