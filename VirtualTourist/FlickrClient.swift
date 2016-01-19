@@ -11,28 +11,31 @@ import UIKit
 let BASE_URL = "https://api.flickr.com/services/rest/"
 let METHOD_NAME = "flickr.photos.search"
 let API_KEY = "5196cb5448befb0611703b847aa9f893"
-let GALLERY_ID = "5704-72157622566655097"
 let EXTRAS = "url_m"
 let DATA_FORMAT = "json"
 let NO_JSON_CALLBACK = "1"
+let SAFE_SEARCH = "1"
+let PER_PAGE = "21"
 
 class FlickrClient {
-    
-    
-    let methodArguments = [
-        "method": METHOD_NAME,
-        "api_key": API_KEY,
-        "text": "baby asian elephant",
-        "extras": EXTRAS,
-        "format": DATA_FORMAT,
-        "nojsoncallback": NO_JSON_CALLBACK
-    ]
+
 
     
 
 
-    func getImageFromFlickrBySearch(methodArguments: [String: AnyObject])
+    func searchImagesByLatLon(pin: Pin)
     {
+        let methodArguments = [
+            "method": METHOD_NAME,
+            "api_key": API_KEY,
+            "extras": EXTRAS,
+            "format": DATA_FORMAT,
+            "nojsoncallback": NO_JSON_CALLBACK,
+            "safe_search": SAFE_SEARCH,
+            "per_page": PER_PAGE,
+            "bbox": createBBox(pin)
+        ]
+        
         // Get the shared NSURLSession to facilitate network activity
         let session = NSURLSession.sharedSession()
         
@@ -50,8 +53,6 @@ class FlickrClient {
                 let parsingError: NSError? = nil
                 do {
                     if let parsedResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.AllowFragments) as? NSDictionary {
-                        
-                        // if let photosDictionary = p
                         
                         if let photosDictionary = parsedResult["photos"] as? NSDictionary
                         {
@@ -71,7 +72,7 @@ class FlickrClient {
                                 }
                             }
                         }
-                        //   print(parsedResult)
+                        print(parsedResult)
                     }
                 } catch {
                     print(parsingError)
@@ -83,6 +84,14 @@ class FlickrClient {
         
         task.resume()
         
+    }
+    
+    func createBBox(pin: Pin) -> String{
+        let minLon = (pin.longitude).doubleValue - 0.5
+        let minLat = (pin.latitude).doubleValue - 0.5
+        let maxLon = (pin.longitude).doubleValue + 0.5
+        let maxLat = (pin.latitude).doubleValue + 0.5
+        return "\(minLon), \(minLat), \(maxLon), \(maxLat)"
     }
     
     /* Helper function: Given a dictionary of parameters, convert to a string for a url */
@@ -111,6 +120,12 @@ class FlickrClient {
             static var sharedInstance = FlickrClient()
         }
         return Singleton.sharedInstance
+    }
+    
+    // MARK: - Shared Image Cache
+    
+    struct Caches {
+        static let imageCache = ImageCache()
     }
 
     

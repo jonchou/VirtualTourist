@@ -14,6 +14,7 @@ class Photo: NSManagedObject {
    // @NSManaged var pin: Pin
  //   @NSManaged var longitude: NSNumber
     @NSManaged var id: String?
+    @NSManaged var imagePath: String?
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -26,4 +27,14 @@ class Photo: NSManagedObject {
         //self.pin = pin
     }
 
+    var image: UIImage? {
+        
+        get {
+            return FlickrClient.Caches.imageCache.imageWithIdentifier(imagePath)
+        }
+        
+        set {
+            FlickrClient.Caches.imageCache.storeImage(image, withIdentifier: imagePath!)
+        }
+    }
 }

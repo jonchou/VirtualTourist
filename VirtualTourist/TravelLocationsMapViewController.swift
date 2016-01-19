@@ -75,9 +75,11 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         // beginning of gesture recognition
         if sender.state == UIGestureRecognizerState.Began {
             self.mapView.addAnnotation(annotation)
-            _ = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: sharedContext)
+            let newPin = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: sharedContext)
             
             CoreDataStackManager.sharedInstance().saveContext()
+            
+            FlickrClient.sharedInstance().searchImagesByLatLon(newPin)
         }
         
     }
