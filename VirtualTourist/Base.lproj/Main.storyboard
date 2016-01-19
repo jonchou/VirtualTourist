@@ -109,9 +109,19 @@
                                     <outlet property="delegate" destination="cFd-sT-Gw0" id="XZY-qn-GF9"/>
                                 </connections>
                             </collectionView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P0y-l1-8Ju">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="0X2-cT-P9k"/>
+                                    <barButtonItem title="Button" id="6UG-nb-g2d"/>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="8BG-Uh-h6K"/>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="P0y-l1-8Ju" secondAttribute="trailing" constant="-20" id="5HW-is-IkK"/>
+                            <constraint firstItem="P0y-l1-8Ju" firstAttribute="leading" secondItem="jxY-Xj-vf0" secondAttribute="leadingMargin" constant="-20" id="6aB-XS-uB5"/>
                             <constraint firstItem="YK0-wc-COc" firstAttribute="top" secondItem="9BV-7g-7SS" secondAttribute="bottom" constant="20" id="ENf-Ah-PvZ"/>
                             <constraint firstItem="bNJ-Jt-3yQ" firstAttribute="top" secondItem="5V4-Fy-28j" secondAttribute="bottom" id="GLJ-vQ-bE5"/>
                             <constraint firstItem="bNJ-Jt-3yQ" firstAttribute="leading" secondItem="jxY-Xj-vf0" secondAttribute="leadingMargin" id="HWF-pI-dg5"/>
@@ -119,10 +129,12 @@
                             <constraint firstAttribute="trailingMargin" secondItem="bNJ-Jt-3yQ" secondAttribute="trailing" id="fOk-mi-6wB"/>
                             <constraint firstItem="9BV-7g-7SS" firstAttribute="top" secondItem="bNJ-Jt-3yQ" secondAttribute="bottom" constant="8" id="iCq-Fb-Ve5"/>
                             <constraint firstItem="9BV-7g-7SS" firstAttribute="trailing" secondItem="jxY-Xj-vf0" secondAttribute="trailingMargin" id="lBd-bQ-Ku8"/>
+                            <constraint firstItem="YK0-wc-COc" firstAttribute="top" secondItem="P0y-l1-8Ju" secondAttribute="bottom" id="nGh-9y-vtg"/>
                             <constraint firstItem="YK0-wc-COc" firstAttribute="top" secondItem="bNJ-Jt-3yQ" secondAttribute="bottom" constant="500" id="qiP-e1-DMx"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bottomButton" destination="6UG-nb-g2d" id="KZj-VG-tOn"/>
                         <outlet property="collectionView" destination="9BV-7g-7SS" id="wsz-b1-8Tf"/>
                         <outlet property="mapView" destination="bNJ-Jt-3yQ" id="LPz-nW-sOt"/>
                     </connections>
