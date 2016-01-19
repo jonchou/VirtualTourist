@@ -56,6 +56,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             print("Error performing initial fetch: \(error)")
         }
         
+        updateBottomButton()
         
         //FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments)
     }
@@ -150,7 +151,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         configureCell(cell, atIndexPath: indexPath)
         
         // And update the buttom button
-       // updateBottomButton()
+        updateBottomButton()
     }
     
     
@@ -243,4 +244,12 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         return fetchedResultsController
     }()
     
+    
+    func updateBottomButton() {
+        if selectedIndexes.count > 0 {
+            bottomButton.title = "Remove Selected Photos"
+        } else {
+            bottomButton.title = "New Collection"
+        }
+    }
 }
