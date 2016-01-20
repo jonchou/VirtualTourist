@@ -20,6 +20,7 @@
 		7BBB6A7A1C4DD8EF00BCE0B3 /* FlickrCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBB6A791C4DD8EF00BCE0B3 /* FlickrCell.swift */; };
 		7BBB6A7C1C4DE96900BCE0B3 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBB6A7B1C4DE96900BCE0B3 /* Photo.swift */; };
 		7BBB6A7E1C4E256600BCE0B3 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBB6A7D1C4E256600BCE0B3 /* ImageCache.swift */; };
+		7BBB6A811C4F302000BCE0B3 /* FlickrConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBB6A801C4F302000BCE0B3 /* FlickrConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		7BBB6A791C4DD8EF00BCE0B3 /* FlickrCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrCell.swift; sourceTree = "<group>"; };
 		7BBB6A7B1C4DE96900BCE0B3 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		7BBB6A7D1C4E256600BCE0B3 /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		7BBB6A801C4F302000BCE0B3 /* FlickrConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				7BBB6A771C4DCF1400BCE0B3 /* FlickrClient.swift */,
+				7BBB6A801C4F302000BCE0B3 /* FlickrConstants.swift */,
 				7BBB6A7D1C4E256600BCE0B3 /* ImageCache.swift */,
 				7B8EBC0A1C1AD960004FE088 /* Pin.swift */,
 				7BBB6A7B1C4DE96900BCE0B3 /* Photo.swift */,
@@ -170,6 +173,7 @@
 				7BBB6A7E1C4E256600BCE0B3 /* ImageCache.swift in Sources */,
 				7B8EBC0B1C1AD960004FE088 /* Pin.swift in Sources */,
 				7B8EBC091C1AD3F0004FE088 /* TravelLocationsMapViewController.swift in Sources */,
+				7BBB6A811C4F302000BCE0B3 /* FlickrConstants.swift in Sources */,
 				7BBB6A781C4DCF1400BCE0B3 /* FlickrClient.swift in Sources */,
 				7BBB6A7C1C4DE96900BCE0B3 /* Photo.swift in Sources */,
 				7B8EBBF11C1ACFFF004FE088 /* VirtualTourist.xcdatamodeld in Sources */,

@@ -9,31 +9,19 @@
 import UIKit
 import CoreData
 
-let BASE_URL = "https://api.flickr.com/services/rest/"
-let METHOD_NAME = "flickr.photos.search"
-let API_KEY = "5196cb5448befb0611703b847aa9f893"
-let EXTRAS = "url_m"
-let DATA_FORMAT = "json"
-let NO_JSON_CALLBACK = "1"
-let SAFE_SEARCH = "1"
-let PER_PAGE = "21"
 
 class FlickrClient {
-
-
-    
-
 
     func searchImagesByLatLon(pin: Pin)
     {
         let methodArguments = [
-            "method": METHOD_NAME,
-            "api_key": API_KEY,
-            "extras": EXTRAS,
-            "format": DATA_FORMAT,
-            "nojsoncallback": NO_JSON_CALLBACK,
-            "safe_search": SAFE_SEARCH,
-            "per_page": PER_PAGE,
+            "api_key": Constants.API_KEY,
+            "method": Methods.PHOTO_SEARCH,
+            "extras": Constants.EXTRAS,
+            "format": Constants.DATA_FORMAT,
+            "nojsoncallback": Constants.NO_JSON_CALLBACK,
+            "safe_search": Constants.SAFE_SEARCH,
+            "per_page": Constants.PER_PAGE,
             "bbox": createBBox(pin)
         ]
         
@@ -41,7 +29,7 @@ class FlickrClient {
         let session = NSURLSession.sharedSession()
         
         // Create NSURLRequest using properly escaped URL
-        let urlString = BASE_URL + escapedParameters(methodArguments)
+        let urlString = Constants.BASE_URL + escapedParameters(methodArguments)
         let url = NSURL(string: urlString)!
         let request = NSURLRequest(URL: url)
         
