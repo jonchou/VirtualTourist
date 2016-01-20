@@ -26,7 +26,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     var updatedIndexPaths: [NSIndexPath]!
     
     
-    var pin: MKPointAnnotation!
+    var pin: Pin!
 
     
     
@@ -34,15 +34,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         super.viewDidLoad()
         initializeMapView()
         initializePin()
-        
-        let methodArguments = [
-            "method": METHOD_NAME,
-            "api_key": API_KEY,
-            "text": "baby asian elephant",
-            "extras": EXTRAS,
-            "format": DATA_FORMAT,
-            "nojsoncallback": NO_JSON_CALLBACK
-        ]
         
         // Start the fetched results controller
         var error: NSError?
@@ -236,7 +227,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         
         let fetchRequest = NSFetchRequest(entityName: "Photo")
         fetchRequest.sortDescriptors = []
-        //fetchRequest.predicate = NSPredicate(format: "pin == %@", self.pin);
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", self.pin);
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self

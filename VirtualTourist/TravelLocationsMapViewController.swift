@@ -74,8 +74,16 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         
         // beginning of gesture recognition
         if sender.state == UIGestureRecognizerState.Began {
-            self.mapView.addAnnotation(annotation)
-            let newPin = Pin(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: sharedContext)
+
+            
+            let dictionary: [String: AnyObject] = [
+                Pin.Keys.Latitude : annotation.coordinate.latitude,
+                Pin.Keys.Longitude : annotation.coordinate.longitude,
+            ]
+            
+            let newPin = Pin(dictionary: dictionary, context: sharedContext)
+            
+            self.mapView.addAnnotation(newPin)
             
             CoreDataStackManager.sharedInstance().saveContext()
             
@@ -83,6 +91,8 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         }
         
     }
+    
+    /*
     
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         let reuseId = "pin"
@@ -99,13 +109,13 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         
         return pinView
     }
-    
+    */
     
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         // Go to the next view controller
         let viewController = storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
-        viewController.pin = view.annotation as! MKPointAnnotation
+        viewController.pin = view.annotation as! Pin
         // need to deselect pin or else when coming back to vc can't reselect pin
         mapView.deselectAnnotation(view.annotation, animated: false)
         

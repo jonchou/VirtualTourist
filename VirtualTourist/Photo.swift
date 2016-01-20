@@ -11,10 +11,18 @@ import UIKit
 
 
 class Photo: NSManagedObject {
-   // @NSManaged var pin: Pin
- //   @NSManaged var longitude: NSNumber
+    struct Keys {
+        static let ID = "id"
+        static let imageURL = "url_m"
+       // static let ReleaseDate = "release_date"
+    }
+    
+    
     @NSManaged var id: String?
     @NSManaged var imagePath: String?
+    @NSManaged var pin: Pin
+    @NSManaged var imageUrl: String?
+
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -24,7 +32,11 @@ class Photo: NSManagedObject {
         
         let entity =  NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity,insertIntoManagedObjectContext: context)
-        //self.pin = pin
+        
+        self.pin = pin
+        self.id = dictionary[Keys.ID] as? String
+        self.imageUrl = dictionary[Keys.imageURL] as? String
+        self.imagePath = imageUrl
     }
 
     var image: UIImage? {

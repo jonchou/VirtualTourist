@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 let BASE_URL = "https://api.flickr.com/services/rest/"
 let METHOD_NAME = "flickr.photos.search"
@@ -62,12 +63,11 @@ class FlickrClient {
                             }
                             if totalPhotosVal > 0 {
                                 if let photoArray = photosDictionary["photo"] as? [[String: AnyObject]] {
-                                    let randomPhotoIndex = Int(arc4random_uniform(UInt32(photoArray.count)))
-                                    let photoDictionary = photoArray[randomPhotoIndex] as [String: AnyObject]
-                                    let photoTitle = photoDictionary["title"] as? String /* non-fatal */
+                                    for photo in photoArray {
+                                        _ = Photo(dictionary: photo, pin: pin, context: self.sharedContext)
+
+                                    }
                                     
-                                    let imageUrlString = photoDictionary["url_m"] as? String
-                                    print(imageUrlString)
                                     
                                 }
                             }
@@ -127,6 +127,10 @@ class FlickrClient {
     struct Caches {
         static let imageCache = ImageCache()
     }
+    
+    lazy var sharedContext: NSManagedObjectContext = {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }()
 
     
 }

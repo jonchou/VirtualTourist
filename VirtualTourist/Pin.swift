@@ -9,20 +9,30 @@
 import CoreData
 import MapKit
 
-class Pin: NSManagedObject {
+//@objc(Pin)
+
+class Pin: NSManagedObject, MKAnnotation {
+    
+    struct Keys {
+        static let Latitude = "latitude"
+        static let Longitude = "longitude"
+    }
+    
     @NSManaged var latitude: NSNumber
     @NSManaged var longitude: NSNumber
+    @NSManaged var photos: [Photo]
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
-    init(latitude: Double, longitude: Double, context: NSManagedObjectContext){
+    init(dictionary: [String:AnyObject], context: NSManagedObjectContext){
         
         let entity =  NSEntityDescription.entityForName("Pin", inManagedObjectContext: context)!
         super.init(entity: entity,insertIntoManagedObjectContext: context)
-        self.latitude = latitude
-        self.longitude = longitude
+        
+        latitude = dictionary[Keys.Latitude] as! NSNumber
+        longitude = dictionary[Keys.Longitude] as! NSNumber
     }
     
     var coordinate: CLLocationCoordinate2D {
