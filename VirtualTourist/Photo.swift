@@ -36,7 +36,9 @@ class Photo: NSManagedObject {
         self.pin = pin
         self.id = dictionary[Keys.ID] as? String
         self.imageUrl = dictionary[Keys.imageURL] as? String
-        self.imagePath = imageUrl
+        
+        let myURL = NSURL(string: imageUrl!)
+        self.imagePath = myURL?.lastPathComponent
     }
 
     var image: UIImage? {

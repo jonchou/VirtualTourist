@@ -11,4 +11,5 @@ import UIKit
 class FlickrCell: UICollectionViewCell {
     
     @IBOutlet weak var FlickrCellImage: UIImageView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 }

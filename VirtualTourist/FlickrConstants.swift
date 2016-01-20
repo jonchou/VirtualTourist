@@ -23,4 +23,8 @@ extension FlickrClient {
     struct Methods {
         static let PHOTO_SEARCH = "flickr.photos.search"
     }
+    
+    struct Keys {
+        static let ErrorStatusMessage = "status_message"
+    }
 }

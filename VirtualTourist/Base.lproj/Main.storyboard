@@ -89,18 +89,26 @@
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="O55-if-R74">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </imageView>
+                                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="kM6-3g-wyX">
+                                                    <rect key="frame" x="15" y="15" width="20" height="20"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <color key="backgroundColor" red="0.047412989827864016" green="0.27559201953848911" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
+                                            <constraint firstAttribute="bottomMargin" secondItem="kM6-3g-wyX" secondAttribute="bottom" constant="7" id="3Ca-hS-M6G"/>
+                                            <constraint firstAttribute="trailingMargin" secondItem="kM6-3g-wyX" secondAttribute="trailing" constant="7" id="3Sg-be-aIl"/>
                                             <constraint firstItem="O55-if-R74" firstAttribute="leading" secondItem="fFa-7V-noO" secondAttribute="leadingMargin" constant="-8" id="Cu7-E0-6Lq"/>
+                                            <constraint firstItem="kM6-3g-wyX" firstAttribute="leading" secondItem="fFa-7V-noO" secondAttribute="leadingMargin" constant="7" id="HhR-XN-jy6"/>
+                                            <constraint firstItem="kM6-3g-wyX" firstAttribute="top" secondItem="fFa-7V-noO" secondAttribute="topMargin" constant="7" id="M2t-7W-H15"/>
                                             <constraint firstAttribute="trailingMargin" secondItem="O55-if-R74" secondAttribute="trailing" constant="-8" id="Z3S-Yz-tGa"/>
                                             <constraint firstAttribute="bottomMargin" secondItem="O55-if-R74" secondAttribute="bottom" constant="-8" id="hbH-jc-e2V"/>
                                             <constraint firstItem="O55-if-R74" firstAttribute="top" secondItem="fFa-7V-noO" secondAttribute="topMargin" constant="-8" id="qwD-Wl-cPJ"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="FlickrCellImage" destination="O55-if-R74" id="2be-wV-NAM"/>
+                                            <outlet property="activityIndicator" destination="kM6-3g-wyX" id="8tE-c6-eVG"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>

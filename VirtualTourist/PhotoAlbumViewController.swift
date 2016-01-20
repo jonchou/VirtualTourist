@@ -94,9 +94,43 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     func configureCell(cell: FlickrCell, atIndexPath indexPath: NSIndexPath) {
         
-        //let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        cell.backgroundColor = UIColor.grayColor()
         
-        //cell.FlickrCellImage = photo.pin
+        // clear old images
+        cell.FlickrCellImage.image = nil
+        cell.activityIndicator.hidden = false
+        cell.activityIndicator.startAnimating()
+
+        
+        let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        
+        if photo.imagePath != nil {
+            print("path is \(FlickrClient.Caches.imageCache.pathForIdentifier(photo.imagePath!))")
+        }
+        
+        // if the photo has been saved already
+        if let _ = photo.image {
+            cell.FlickrCellImage.image = photo.image
+           // print("does it get here ever")
+        } else {
+            // need to download the image
+            let _ = FlickrClient.sharedInstance().taskForImage(photo.imageUrl!) { (imageData, error) -> Void in
+                
+                if let data = imageData {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        let image = UIImage(data: data)
+                        //myPhoto.image = image
+                        cell.FlickrCellImage.image = image
+                        cell.activityIndicator.hidden = true
+                        cell.activityIndicator.stopAnimating()
+                    }
+                } else {
+                    // connection error
+                }
+            }
+        }
+        
+        
         
         // If the cell is "selected" it's color panel is grayed out
         // we use the Swift `find` function to see if the indexPath is in the array
@@ -110,9 +144,15 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
   
     // Mark - UI Collection View
     
+    
+    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+        return self.fetchedResultsController.sections?.count ?? 0
+    }
+    
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // TODO: Change count of pictures returned
-        return fetchedResultsController.sections?.count ?? 0
+        let sectionInfo = self.fetchedResultsController.sections![section]
+        
+        return sectionInfo.numberOfObjects
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -123,7 +163,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         //cell.imageView.image = meme.image
         
         //TODO: set image of cell from search using configureCell()
-        
+        dispatch_async(dispatch_get_main_queue(), {
+            self.configureCell(cell, atIndexPath: indexPath)
+        })
         return cell
     }
     

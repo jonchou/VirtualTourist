@@ -11,6 +11,13 @@ import CoreData
 
 
 class FlickrClient {
+    
+    var session: NSURLSession
+    
+    init() {
+        session = NSURLSession.sharedSession()
+    }
+
 
     func searchImagesByLatLon(pin: Pin)
     {
@@ -26,7 +33,7 @@ class FlickrClient {
         ]
         
         // Get the shared NSURLSession to facilitate network activity
-        let session = NSURLSession.sharedSession()
+        //let session = NSURLSession.sharedSession()
         
         // Create NSURLRequest using properly escaped URL
         let urlString = Constants.BASE_URL + escapedParameters(methodArguments)
@@ -53,7 +60,7 @@ class FlickrClient {
                                 if let photoArray = photosDictionary["photo"] as? [[String: AnyObject]] {
                                     for photo in photoArray {
                                         _ = Photo(dictionary: photo, pin: pin, context: self.sharedContext)
-
+                                        CoreDataStackManager.sharedInstance().saveContext()
                                     }
                                     
                                     
@@ -74,12 +81,55 @@ class FlickrClient {
         
     }
     
+    func taskForImage(filePath: String, completionHandler: (imageData: NSData?, error: NSError?) ->  Void) -> NSURLSessionTask {
+        
+        let url = NSURL(string: filePath)!
+        
+        print(url)
+        
+        let request = NSURLRequest(URL: url)
+        
+        let task = session.dataTaskWithRequest(request) {data, response, downloadError in
+            
+            if let error = downloadError {
+                let newError = FlickrClient.errorForData(data, response: response, error: error)
+                completionHandler(imageData: nil, error: newError)
+            } else {
+                completionHandler(imageData: data, error: nil)
+            }
+        }
+        
+        task.resume()
+        
+        return task
+    }
+    
     func createBBox(pin: Pin) -> String{
         let minLon = (pin.longitude).doubleValue - 0.5
         let minLat = (pin.latitude).doubleValue - 0.5
         let maxLon = (pin.longitude).doubleValue + 0.5
         let maxLat = (pin.latitude).doubleValue + 0.5
         return "\(minLon), \(minLat), \(maxLon), \(maxLat)"
+    }
+    
+    
+    class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
+        
+        if data == nil {
+            return error
+        }
+        
+        do {
+            let parsedResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.AllowFragments)
+            
+            if let parsedResult = parsedResult as? [String : AnyObject], errorMessage = parsedResult[FlickrClient.Keys.ErrorStatusMessage] as? String {
+                let userInfo = [NSLocalizedDescriptionKey : errorMessage]
+                return NSError(domain: "Flickr Error", code: 1, userInfo: userInfo)
+            }
+            
+        } catch _ {}
+        
+        return error
     }
     
     /* Helper function: Given a dictionary of parameters, convert to a string for a url */
