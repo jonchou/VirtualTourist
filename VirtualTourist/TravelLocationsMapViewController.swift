@@ -36,9 +36,7 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
     func restorePins() {
         let pinArray = fetchedResultsController.fetchedObjects as! [Pin]
         for pin in pinArray {
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = pin.coordinate
-            mapView.addAnnotation(annotation)
+            mapView.addAnnotation(pin)
         }
     
     }
@@ -66,19 +64,15 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         }()
     
     func addPin(sender: UIGestureRecognizer) {
-        let annotation = MKPointAnnotation()
         let point = sender.locationInView(mapView)
         let coordinates = mapView.convertPoint(point, toCoordinateFromView: mapView)
-        annotation.coordinate = coordinates
-
         
         // beginning of gesture recognition
         if sender.state == UIGestureRecognizerState.Began {
 
-            
             let dictionary: [String: AnyObject] = [
-                Pin.Keys.Latitude : annotation.coordinate.latitude,
-                Pin.Keys.Longitude : annotation.coordinate.longitude,
+                Pin.Keys.Latitude : coordinates.latitude,
+                Pin.Keys.Longitude : coordinates.longitude,
             ]
             
             let newPin = Pin(dictionary: dictionary, context: sharedContext)
@@ -92,30 +86,11 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         
     }
     
-    /*
-    
-    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
-        let reuseId = "pin"
-        var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
-        
-        if pinView == nil {
-            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            pinView!.canShowCallout = false
-            pinView!.pinTintColor = UIColor.redColor()
-            pinView!.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure)
-        } else {
-            pinView!.annotation = annotation
-        }
-        
-        return pinView
-    }
-    */
-    
-    
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         // Go to the next view controller
         let viewController = storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
         viewController.pin = view.annotation as! Pin
+        
         // need to deselect pin or else when coming back to vc can't reselect pin
         mapView.deselectAnnotation(view.annotation, animated: false)
         
