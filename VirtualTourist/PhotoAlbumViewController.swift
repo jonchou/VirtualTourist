@@ -244,9 +244,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         case .Move:
             print("Move an item. We don't expect to see this in this app.")
             break
-        default:
-            break
-        }
     }
     
     // This method is invoked after all of the changed in the current batch have been collected

@@ -69,14 +69,6 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="bNJ-Jt-3yQ">
                                 <rect key="frame" x="20" y="20" width="560" height="80"/>
                             </mapView>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P0y-l1-8Ju">
-                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
-                                <items>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="0X2-cT-P9k"/>
-                                    <barButtonItem title="Button" id="6UG-nb-g2d"/>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="8BG-Uh-h6K"/>
-                                </items>
-                            </toolbar>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="9BV-7g-7SS">
                                 <rect key="frame" x="20" y="108" width="560" height="472"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="MKk-Fi-voD">
@@ -123,6 +115,14 @@
                                     <outlet property="delegate" destination="cFd-sT-Gw0" id="XZY-qn-GF9"/>
                                 </connections>
                             </collectionView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="P0y-l1-8Ju">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="0X2-cT-P9k"/>
+                                    <barButtonItem title="Button" id="6UG-nb-g2d"/>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="8BG-Uh-h6K"/>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
