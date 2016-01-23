@@ -67,7 +67,7 @@ class FlickrClient {
                                 }
                             }
                         }
-                        print(parsedResult)
+                       // print(parsedResult)
                     }
                 } catch {
                     print(parsingError)
@@ -85,7 +85,7 @@ class FlickrClient {
         
         let url = NSURL(string: filePath)!
         
-        print(url)
+//        print(url)
         
         let request = NSURLRequest(URL: url)
         

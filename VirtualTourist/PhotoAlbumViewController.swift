@@ -27,8 +27,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     
     var pin: Pin!
-
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,8 +46,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         }
         
         updateBottomButton()
-        
-        //FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments)
     }
     
     // disables user interaction with the map view
@@ -94,32 +90,37 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     func configureCell(cell: FlickrCell, atIndexPath indexPath: NSIndexPath) {
         
-        cell.backgroundColor = UIColor.grayColor()
-        
-        // clear old images
+        // reset cells to loading
+        cell.backgroundColor = UIColor.blackColor()
         cell.FlickrCellImage.image = nil
         cell.activityIndicator.hidden = false
         cell.activityIndicator.startAnimating()
-
         
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         
         if photo.imagePath != nil {
-            print("path is \(FlickrClient.Caches.imageCache.pathForIdentifier(photo.imagePath!))")
+            //print("path is \(FlickrClient.Caches.imageCache.pathForIdentifier(photo.imagePath!))")
         }
         
         // if the photo has been saved already
-        if let _ = photo.image {
-            cell.FlickrCellImage.image = photo.image
-           // print("does it get here ever")
+        if let myImage = photo.image {
+            cell.FlickrCellImage.image = myImage
+            cell.activityIndicator.hidden = true
+            cell.activityIndicator.stopAnimating()
+            print("photo found on hard drive")
         } else {
+            
             // need to download the image
-            let _ = FlickrClient.sharedInstance().taskForImage(photo.imageUrl!) { (imageData, error) -> Void in
+            print("downloading image")
+            let task = FlickrClient.sharedInstance().taskForImage(photo.imageUrl!) { (imageData, error) -> Void in
                 
                 if let data = imageData {
                     dispatch_async(dispatch_get_main_queue()) {
                         let image = UIImage(data: data)
-                        //myPhoto.image = image
+                        
+                        // stores photo into image cache
+                        photo.image = image
+                        
                         cell.FlickrCellImage.image = image
                         cell.activityIndicator.hidden = true
                         cell.activityIndicator.stopAnimating()
@@ -128,6 +129,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                     // connection error
                 }
             }
+            cell.taskToCancelifCellIsReused = task
         }
         
         
@@ -136,9 +138,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         // we use the Swift `find` function to see if the indexPath is in the array
         
         if let _ = selectedIndexes.indexOf(indexPath) {
-            cell.backgroundView?.alpha = 0.05
+            cell.FlickrCellImage.alpha = 0.05
         } else {
-            cell.backgroundView?.alpha = 1.0
+            cell.FlickrCellImage.alpha = 1.0
         }
     }
   
@@ -157,15 +159,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrCell", forIndexPath: indexPath) as! FlickrCell
-        //let meme = memes[indexPath.item]
-        //cell.setText(meme.topText!, botText: meme.botText!)
-        //cell.setAttributes(meme.topText!, botText: meme.botText!, memeAttribText: memeTextAttributes)
-        //cell.imageView.image = meme.image
-        
-        //TODO: set image of cell from search using configureCell()
+
         dispatch_async(dispatch_get_main_queue(), {
             self.configureCell(cell, atIndexPath: indexPath)
         })
+        
         return cell
     }
     
@@ -188,6 +186,20 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     }
     
     
+    // MARK: NSFetchedResultsController
+    lazy var fetchedResultsController: NSFetchedResultsController = {
+        
+        let fetchRequest = NSFetchRequest(entityName: "Photo")
+        fetchRequest.sortDescriptors = []
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", self.pin);
+        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        
+        return fetchedResultsController
+    }()
+    
+    
     // MARK: - Fetched Results Controller Delegate
     
     // Whenever changes are made to Core Data the following three methods are invoked. This first method is used to create
@@ -201,31 +213,31 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         print("in controllerWillChangeContent")
     }
     
-    // The second method may be called multiple times, once for each Color object that is added, deleted, or changed.
-    // We store the incex paths into the three arrays.
+    // The second method may be called multiple times, once for each Photo object that is added, deleted, or changed.
+    // We store the index paths into the three arrays.
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         
         switch type{
             
         case .Insert:
             print("Insert an item")
-            // Here we are noting that a new Color instance has been added to Core Data. We remember its index path
+            // Here we are noting that a new Photo instance has been added to Core Data. We remember its index path
             // so that we can add a cell in "controllerDidChangeContent". Note that the "newIndexPath" parameter has
             // the index path that we want in this case
             insertedIndexPaths.append(newIndexPath!)
             break
         case .Delete:
             print("Delete an item")
-            // Here we are noting that a Color instance has been deleted from Core Data. We keep remember its index path
+            // Here we are noting that a Photo instance has been deleted from Core Data. We keep remember its index path
             // so that we can remove the corresponding cell in "controllerDidChangeContent". The "indexPath" parameter has
             // value that we want in this case.
             deletedIndexPaths.append(indexPath!)
             break
         case .Update:
             print("Update an item.")
-            // We don't expect Color instances to change after they are created. But Core Data would
+            // We don't expect Photo instances to change after they are created. But Core Data would
             // notify us of changes if any occured. This can be useful if you want to respond to changes
-            // that come about after data is downloaded. For example, when an images is downloaded from
+            // that come about after data is downloaded. For example, when an image is downloaded from
             // Flickr in the Virtual Tourist app
             updatedIndexPaths.append(indexPath!)
             break
@@ -264,18 +276,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             }, completion: nil)
     }
     
-    // MARK: NSFetchedResultsController
-    lazy var fetchedResultsController: NSFetchedResultsController = {
-        
-        let fetchRequest = NSFetchRequest(entityName: "Photo")
-        fetchRequest.sortDescriptors = []
-        fetchRequest.predicate = NSPredicate(format: "pin == %@", self.pin);
-        
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
-        fetchedResultsController.delegate = self
-        
-        return fetchedResultsController
-    }()
+
     
     
     func updateBottomButton() {
