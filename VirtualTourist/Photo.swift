@@ -44,12 +44,12 @@ class Photo: NSManagedObject {
     var image: UIImage? {
         
         get {
-            print("checking imagecache")
+            //print("checking imagecache")
             return FlickrClient.Caches.imageCache.imageWithIdentifier(imagePath)
         }
         
         set {
-            print("photo being saved to imagecache")
+            //print("photo being saved to imagecache")
             FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: imagePath!)
         }
     }

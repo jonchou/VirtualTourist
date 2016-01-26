@@ -98,20 +98,16 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         
-        if photo.imagePath != nil {
-            //print("path is \(FlickrClient.Caches.imageCache.pathForIdentifier(photo.imagePath!))")
-        }
-        
         // if the photo has been saved already
         if let myImage = photo.image {
             cell.FlickrCellImage.image = myImage
             cell.activityIndicator.hidden = true
             cell.activityIndicator.stopAnimating()
-            print("photo found on hard drive")
+            //print("photo found on hard drive")
         } else {
             
             // need to download the image
-            print("downloading image")
+            //print("downloading image")
             let task = FlickrClient.sharedInstance().taskForImage(photo.imageUrl!) { (imageData, error) -> Void in
                 
                 if let data = imageData {
@@ -138,7 +134,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         // we use the Swift `find` function to see if the indexPath is in the array
         
         if let _ = selectedIndexes.indexOf(indexPath) {
-            cell.FlickrCellImage.alpha = 0.05
+            cell.FlickrCellImage.alpha = 0.5
         } else {
             cell.FlickrCellImage.alpha = 1.0
         }
@@ -247,8 +243,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         }
     }
     
-    // This method is invoked after all of the changed in the current batch have been collected
-    // into the three index path arrays (insert, delete, and upate). We now need to loop through the
+    // This method is invoked after all of the changes in the current batch have been collected
+    // into the three index path arrays (insert, delete, and update). We now need to loop through the
     // arrays and perform the changes.
     //
     // The most interesting thing about the method is the collection view's "performBatchUpdates" method.
@@ -274,7 +270,44 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             }, completion: nil)
     }
     
-
+    @IBAction func bottomButtonClicked(sender: AnyObject) {
+        if selectedIndexes.isEmpty {
+            // New collection
+            deleteAllImages()
+            // Find new collection after
+            findNewCollection()
+        } else {
+            // Delete Selected Images
+            deleteSelectedImages()
+        }
+    }
+    
+    func deleteAllImages() {
+        for image in fetchedResultsController.fetchedObjects as! [Photo] {
+            sharedContext.deleteObject(image)
+        }
+        
+    }
+    
+    func deleteSelectedImages() {
+        var imagesToDelete = [Photo]()
+        
+        for indexPath in selectedIndexes {
+            imagesToDelete.append(fetchedResultsController.objectAtIndexPath(indexPath) as! Photo)
+        }
+        
+        for image in imagesToDelete {
+            sharedContext.deleteObject(image)
+        }
+        
+        selectedIndexes = [NSIndexPath]()
+        // need to update title of button after we delete images
+        updateBottomButton()
+    }
+    
+    func findNewCollection() {
+        
+    }
     
     
     func updateBottomButton() {
