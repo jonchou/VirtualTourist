@@ -90,13 +90,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     func configureCell(cell: FlickrCell, atIndexPath indexPath: NSIndexPath) {
         
-        // reset cells to loading
-        cell.backgroundColor = UIColor.blackColor()
-        cell.FlickrCellImage.image = nil
-        cell.activityIndicator.hidden = false
-        cell.activityIndicator.startAnimating()
-        
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        
+        //cell.FlickrCellImage.image = UIImage(named: "placeholder")
         
         // if the photo has been saved already
         if let myImage = photo.image {
@@ -108,6 +104,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             
             // need to download the image
             //print("downloading image")
+            cell.activityIndicator.hidden = false
+            cell.activityIndicator.startAnimating()
+            
             let task = FlickrClient.sharedInstance().taskForImage(photo.imageUrl!) { (imageData, error) -> Void in
                 
                 if let data = imageData {
@@ -286,7 +285,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         for image in fetchedResultsController.fetchedObjects as! [Photo] {
             sharedContext.deleteObject(image)
         }
-        
+        CoreDataStackManager.sharedInstance().saveContext()
     }
     
     func deleteSelectedImages() {
@@ -299,6 +298,9 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         for image in imagesToDelete {
             sharedContext.deleteObject(image)
         }
+        
+        CoreDataStackManager.sharedInstance().saveContext()
+
         
         selectedIndexes = [NSIndexPath]()
         // need to update title of button after we delete images
