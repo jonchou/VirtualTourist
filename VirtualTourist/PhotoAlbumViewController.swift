@@ -15,8 +15,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var bottomButton: UIBarButtonItem!
+    @IBOutlet weak var errorLabel: UILabel!
     
     private let reuseIdentifier = "FlickrCell"
+    private var downloadCounter = 0
+
     
     var selectedIndexes = [NSIndexPath]()
     
@@ -43,6 +46,12 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         
         if let error = error {
             print("Error performing initial fetch: \(error)")
+        }
+
+        if fetchedResultsController.fetchedObjects!.count == 0 {
+            errorLabel.hidden = false
+        } else {
+            errorLabel.hidden = true
         }
         
         updateBottomButton()
@@ -104,11 +113,14 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             
             // need to download the image
             //print("downloading image")
+            bottomButton.enabled = false
+            self.downloadCounter += 1
+            
             cell.activityIndicator.hidden = false
             cell.activityIndicator.startAnimating()
 
             let task = FlickrClient.sharedInstance().taskForImage(photo.imageUrl!) { (imageData, error) -> Void in
-                
+
                 if let data = imageData {
                     dispatch_async(dispatch_get_main_queue()) {
                         let image = UIImage(data: data)
@@ -119,6 +131,10 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                         cell.FlickrCellImage.image = image
                         cell.activityIndicator.hidden = true
                         cell.activityIndicator.stopAnimating()
+                        self.downloadCounter -= 1
+                        if self.downloadCounter == 0 {
+                            self.bottomButton.enabled = true
+                        }
                     }
                 } else {
                     // connection error
