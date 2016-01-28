@@ -300,6 +300,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     func deleteAllImages() {
         for image in fetchedResultsController.fetchedObjects as! [Photo] {
             sharedContext.deleteObject(image)
+            deleteFromDocDir(image)
         }
         CoreDataStackManager.sharedInstance().saveContext()
     }
@@ -313,11 +314,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         
         for image in imagesToDelete {
             sharedContext.deleteObject(image)
+            deleteFromDocDir(image)
         }
         
         CoreDataStackManager.sharedInstance().saveContext()
 
-        
         selectedIndexes = [NSIndexPath]()
         // need to update title of button after we delete images
         updateBottomButton()
@@ -325,6 +326,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     func findNewCollection() {
         
+    }
+    
+    func deleteFromDocDir(image: Photo) {
+        let path = FlickrClient.Caches.imageCache.pathForIdentifier(image.imagePath!)
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(path)
+        } catch _ {}
     }
     
     
