@@ -106,7 +106,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             //print("downloading image")
             cell.activityIndicator.hidden = false
             cell.activityIndicator.startAnimating()
-            
+
             let task = FlickrClient.sharedInstance().taskForImage(photo.imageUrl!) { (imageData, error) -> Void in
                 
                 if let data = imageData {

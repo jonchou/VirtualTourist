@@ -13,7 +13,7 @@ import MapKit
 class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -21,6 +21,8 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         self.mapView.addGestureRecognizer(pinDropGesture)
         
         mapView.delegate = self
+        
+        restoreMap()
         
         do {
             try fetchedResultsController.performFetch()
@@ -84,6 +86,35 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
             FlickrClient.sharedInstance().searchImagesByLatLon(newPin)
         }
         
+    }
+    
+    func restoreMap() {
+        if let savedMap = NSUserDefaults.standardUserDefaults().objectForKey("mapData") as? [String: AnyObject] {
+            let region = MKCoordinateRegion(
+                center: CLLocationCoordinate2DMake(savedMap["latitude"] as! CLLocationDegrees,
+                    savedMap["longitude"] as! CLLocationDegrees),
+                // multiplying by this constant allows the span to stop growing larger and larger with each run
+                span: MKCoordinateSpanMake((savedMap["latDelta"] as! CLLocationDegrees) * 0.882,
+                                           (savedMap["longDelta"] as! CLLocationDegrees) * 0.882)
+            )
+            mapView.setRegion(region, animated: false)
+        }
+    }
+
+    func saveMap() {
+        let map: [String: AnyObject] = [
+            "latitude": mapView.region.center.latitude,
+            "longitude": mapView.region.center.longitude,
+            "latDelta": mapView.region.span.latitudeDelta,
+            "longDelta": mapView.region.span.longitudeDelta
+        ]
+        NSUserDefaults.standardUserDefaults().setObject(map, forKey: "mapData")
+    }
+    
+    // MARK: mapView
+    
+    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        saveMap()
     }
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
