@@ -12,6 +12,7 @@ import CoreData
 
 class FlickrClient {
     
+    private var pageNum = 1
     var session: NSURLSession
     
     init() {
@@ -29,7 +30,8 @@ class FlickrClient {
             "nojsoncallback": Constants.NO_JSON_CALLBACK,
             "safe_search": Constants.SAFE_SEARCH,
             "per_page": Constants.PER_PAGE,
-            "bbox": createBBox(pin)
+            "bbox": createBBox(pin),
+            "page": String(pageNum)
         ]
         
         // Get the shared NSURLSession to facilitate network activity
@@ -52,6 +54,15 @@ class FlickrClient {
                         
                         if let photosDictionary = parsedResult["photos"] as? NSDictionary
                         {
+                            // gets the next page for next use
+                            if let maxPageNum = photosDictionary["pages"] as? Int {
+                                if maxPageNum > self.pageNum {
+                                    self.pageNum++
+                                } else if maxPageNum == self.pageNum {
+                                    // go back to the beginning of photos
+                                    self.pageNum = 1
+                                }
+                            }
                             var totalPhotosVal = 0
                             if let totalPhotos = photosDictionary["total"] as? String {
                                 totalPhotosVal = (totalPhotos as NSString).integerValue
@@ -60,14 +71,12 @@ class FlickrClient {
                                 if let photoArray = photosDictionary["photo"] as? [[String: AnyObject]] {
                                     for photo in photoArray {
                                         _ = Photo(dictionary: photo, pin: pin, context: self.sharedContext)
-                                        CoreDataStackManager.sharedInstance().saveContext()
                                     }
-                                    
-                                    
+                                    CoreDataStackManager.sharedInstance().saveContext()
                                 }
                             }
                         }
-                       // print(parsedResult)
+                        //print(parsedResult)
                     }
                 } catch {
                     print(parsingError)

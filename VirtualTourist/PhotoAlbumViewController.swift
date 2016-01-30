@@ -101,7 +101,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         
-        //cell.FlickrCellImage.image = UIImage(named: "placeholder")
         
         // if the photo has been saved already
         if let myImage = photo.image {
@@ -113,6 +112,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             
             // need to download the image
             //print("downloading image")
+            cell.FlickrCellImage.image = UIImage(named: "placeholder")
+
             bottomButton.enabled = false
             self.downloadCounter += 1
             
@@ -290,7 +291,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             // New collection
             deleteAllImages()
             // Find new collection after
-            findNewCollection()
+            FlickrClient.sharedInstance().searchImagesByLatLon(pin)
         } else {
             // Delete Selected Images
             deleteSelectedImages()
@@ -322,10 +323,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         selectedIndexes = [NSIndexPath]()
         // need to update title of button after we delete images
         updateBottomButton()
-    }
-    
-    func findNewCollection() {
-        
     }
     
     func deleteFromDocDir(image: Photo) {
