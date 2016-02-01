@@ -36,12 +36,33 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="moM-FD-nA2">
                                 <rect key="frame" x="0.0" y="64" width="600" height="536"/>
                             </mapView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OJT-R3-CKb" userLabel="TapPinNotificationView">
+                                <rect key="frame" x="0.0" y="600" width="600" height="47"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap Pins to Delete" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y11-2E-P9t">
+                                        <rect key="frame" x="-20" y="15" width="640" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="0.060231345870000001" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstItem="y11-2E-P9t" firstAttribute="leading" secondItem="OJT-R3-CKb" secondAttribute="leading" constant="-20" id="I3c-OA-LGN"/>
+                                    <constraint firstItem="y11-2E-P9t" firstAttribute="top" secondItem="OJT-R3-CKb" secondAttribute="top" constant="15" id="XjS-9f-Mwy"/>
+                                    <constraint firstAttribute="trailing" secondItem="y11-2E-P9t" secondAttribute="trailing" constant="-20" id="bSC-Pe-9uO"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="qC6-R4-Of0" firstAttribute="top" secondItem="moM-FD-nA2" secondAttribute="bottom" id="3ez-ZG-5wj"/>
+                            <constraint firstItem="OJT-R3-CKb" firstAttribute="leading" secondItem="Ruc-H7-by7" secondAttribute="leadingMargin" constant="-20" id="6aj-ZW-TNr"/>
                             <constraint firstItem="moM-FD-nA2" firstAttribute="leading" secondItem="Ruc-H7-by7" secondAttribute="leadingMargin" constant="-20" id="Leg-Yi-War"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="OJT-R3-CKb" secondAttribute="trailing" constant="-20" id="Mqo-Sj-zMW"/>
+                            <constraint firstItem="OJT-R3-CKb" firstAttribute="top" secondItem="moM-FD-nA2" secondAttribute="bottom" id="Nka-T5-ni8"/>
                             <constraint firstAttribute="trailingMargin" secondItem="moM-FD-nA2" secondAttribute="trailing" constant="-20" id="O1y-7J-adV"/>
-                            <constraint firstItem="qC6-R4-Of0" firstAttribute="top" secondItem="moM-FD-nA2" secondAttribute="bottom" id="cDf-yK-YQb"/>
+                            <constraint firstAttribute="bottomMargin" secondItem="OJT-R3-CKb" secondAttribute="bottom" constant="-47" id="PBS-GH-WJX"/>
                             <constraint firstItem="moM-FD-nA2" firstAttribute="top" secondItem="mny-eI-7F6" secondAttribute="bottom" id="dMl-RJ-xe4"/>
                         </constraints>
                     </view>

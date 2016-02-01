@@ -19,22 +19,15 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let pinDropGesture = UILongPressGestureRecognizer(target: self, action: "addPin:")
-        self.mapView.addGestureRecognizer(pinDropGesture)
-        
-        mapView.delegate = self
-        
-        restoreMap()
-        
         do {
             try fetchedResultsController.performFetch()
         } catch {}
     
-        fetchedResultsController.delegate = self
-        
-        // repopulate persisted pins
+        // restore state
+        restoreMap()
         restorePins()
-
+        enableGesture()
+        mapView.delegate = self
     }
     
     func restorePins() {
@@ -42,7 +35,6 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         for pin in pinArray {
             mapView.addAnnotation(pin)
         }
-    
     }
     
     // MARK: - Core Data Convenience.
@@ -51,7 +43,6 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         return CoreDataStackManager.sharedInstance().managedObjectContext
     }
 
-    // TODO: change NSSortDescriptor?
     lazy var fetchedResultsController: NSFetchedResultsController = {
         
         let fetchRequest = NSFetchRequest(entityName: "Pin")
@@ -63,6 +54,7 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
             sectionNameKeyPath: nil,
             cacheName: nil)
         
+        fetchedResultsController.delegate = self
         return fetchedResultsController
         
         }()
@@ -80,11 +72,7 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
             ]
             
             let newPin = Pin(dictionary: dictionary, context: sharedContext)
-            
-            self.mapView.addAnnotation(newPin)
-            
             CoreDataStackManager.sharedInstance().saveContext()
-            
             FlickrClient.sharedInstance().searchImagesByLatLon(newPin)
         }
         
@@ -94,7 +82,7 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         if let savedMap = NSUserDefaults.standardUserDefaults().objectForKey("mapData") as? [String: AnyObject] {
             let region = MKCoordinateRegion(
                 center: CLLocationCoordinate2DMake(savedMap["latitude"] as! CLLocationDegrees,
-                    savedMap["longitude"] as! CLLocationDegrees),
+                                                   savedMap["longitude"] as! CLLocationDegrees),
                 // multiplying by this constant allows the span to stop growing larger and larger with each run
                 span: MKCoordinateSpanMake((savedMap["latDelta"] as! CLLocationDegrees) * 0.882,
                                            (savedMap["longDelta"] as! CLLocationDegrees) * 0.882)
@@ -114,18 +102,58 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
     }
     
     @IBAction func beginEditMode(sender: AnyObject) {
-        // if we were in edit mode and push Done
-        if self.editMode {
-            self.editMode = false
+        if editMode {
+            editMode = false
             editButton.title = "Edit"
             // remove "Tap pins to delete"
+            view.frame.origin.y += 50
+            // reenable gesture recognizer
+            enableGesture()
+
         } else {
           // if we touch Edit
-            self.editMode = true
+            editMode = true
             editButton.title = "Done"
             // raise "Tap pins to delete"
+            view.frame.origin.y -= 50
+            disableGesture()
         }
         
+    }
+    
+    func enableGesture() {
+        let pinDropGesture = UILongPressGestureRecognizer(target: self, action: "addPin:")
+        mapView.addGestureRecognizer(pinDropGesture)
+    }
+    
+    func disableGesture() {
+        if mapView.gestureRecognizers != nil {
+            for gesture in mapView.gestureRecognizers! {
+                if let recognizer = gesture as? UILongPressGestureRecognizer {
+                    mapView.removeGestureRecognizer(recognizer)
+                }
+            }
+        }
+        
+    }
+    
+    // MARK: - Fetched Results Controller Delegate - Need to have this or else NSFetchedResultsController won't update
+  
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        
+        switch type{
+            
+        case .Insert:
+            print("Insert an item")
+            mapView.addAnnotation(anObject as! Pin)
+            break
+        case .Delete:
+            print("Delete an item")
+            mapView.removeAnnotation(anObject as! Pin)
+            break
+        default:
+            break
+        }
     }
     
     
@@ -137,20 +165,17 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         // if we are in edit mode when touching a pin
-        if self.editMode {
-            // delete pin
-            let touchPin = view.annotation as! Pin
+        if editMode {
+            let touchedPin = view.annotation as! Pin
             let pinArray = fetchedResultsController.fetchedObjects as! [Pin]
 
             // iterate through fetchedResultsController to find the touched pin then delete it
             for pin in pinArray {
-                if pin.longitude == touchPin.longitude && pin.latitude == touchPin.latitude {
-                    self.mapView.removeAnnotation(pin)
+                if pin.longitude == touchedPin.longitude && pin.latitude == touchedPin.latitude {
                     sharedContext.deleteObject(pin)
                 }
-                CoreDataStackManager.sharedInstance().saveContext()
             }
-            
+            CoreDataStackManager.sharedInstance().saveContext()
         } else {
             // Go to the next view controller
             let viewController = storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
