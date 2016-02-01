@@ -45,8 +45,15 @@
                             <constraint firstItem="moM-FD-nA2" firstAttribute="top" secondItem="mny-eI-7F6" secondAttribute="bottom" id="dMl-RJ-xe4"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="Txr-mg-Dof"/>
+                    <navigationItem key="navigationItem" id="Txr-mg-Dof">
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="RF5-6F-sfA">
+                            <connections>
+                                <action selector="beginEditMode:" destination="ImT-gB-04m" id="Mhl-hZ-q6E"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
+                        <outlet property="editButton" destination="RF5-6F-sfA" id="yF7-gZ-dQQ"/>
                         <outlet property="mapView" destination="moM-FD-nA2" id="Biz-Nu-NOY"/>
                     </connections>
                 </viewController>

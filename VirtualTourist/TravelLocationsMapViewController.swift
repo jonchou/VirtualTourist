@@ -13,6 +13,8 @@ import MapKit
 class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var editButton: UIBarButtonItem!
+    private var editMode = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,6 +113,22 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         NSUserDefaults.standardUserDefaults().setObject(map, forKey: "mapData")
     }
     
+    @IBAction func beginEditMode(sender: AnyObject) {
+        // if we were in edit mode and push Done
+        if self.editMode {
+            self.editMode = false
+            editButton.title = "Edit"
+            // remove "Tap pins to delete"
+        } else {
+          // if we touch Edit
+            self.editMode = true
+            editButton.title = "Done"
+            // raise "Tap pins to delete"
+        }
+        
+    }
+    
+    
     // MARK: mapView
     
     func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
@@ -118,16 +136,32 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
     }
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
-        // Go to the next view controller
-        let viewController = storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
-        viewController.pin = view.annotation as! Pin
-        
-        // need to deselect pin or else when coming back to vc can't reselect pin
-        mapView.deselectAnnotation(view.annotation, animated: false)
-        
-        // push next vc onto nav controller so that it transitions from the right and we can move back
-        navigationController?.pushViewController(viewController, animated: true)
+        // if we are in edit mode when touching a pin
+        if self.editMode {
+            // delete pin
+            let touchPin = view.annotation as! Pin
+            let pinArray = fetchedResultsController.fetchedObjects as! [Pin]
+
+            // iterate through fetchedResultsController to find the touched pin then delete it
+            for pin in pinArray {
+                if pin.longitude == touchPin.longitude && pin.latitude == touchPin.latitude {
+                    self.mapView.removeAnnotation(pin)
+                    sharedContext.deleteObject(pin)
+                }
+                CoreDataStackManager.sharedInstance().saveContext()
+            }
+            
+        } else {
+            // Go to the next view controller
+            let viewController = storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbumViewController") as! PhotoAlbumViewController
+            viewController.pin = view.annotation as! Pin
+            
+            // need to deselect pin or else when coming back to vc can't reselect pin
+            mapView.deselectAnnotation(view.annotation, animated: false)
+            
+            // push next vc onto nav controller so that it transitions from the right and we can move back
+            navigationController?.pushViewController(viewController, animated: true)
+        }
     }
-    
     
 }
