@@ -30,6 +30,21 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         mapView.delegate = self
     }
     
+    // Restores the center and span of viewing region of mapView
+    func restoreMap() {
+        if let savedMap = NSUserDefaults.standardUserDefaults().objectForKey("mapData") as? [String: AnyObject] {
+            let region = MKCoordinateRegion(
+                center: CLLocationCoordinate2DMake(savedMap["latitude"] as! CLLocationDegrees,
+                    savedMap["longitude"] as! CLLocationDegrees),
+                // multiplying by this constant allows the span to stop growing larger and larger with each run
+                span: MKCoordinateSpanMake((savedMap["latDelta"] as! CLLocationDegrees) * 0.882,
+                    (savedMap["longDelta"] as! CLLocationDegrees) * 0.882)
+            )
+            mapView.setRegion(region, animated: false)
+        }
+    }
+    
+    // adds all pins from the FRC
     func restorePins() {
         let pinArray = fetchedResultsController.fetchedObjects as! [Pin]
         for pin in pinArray {
@@ -37,28 +52,7 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         }
     }
     
-    // MARK: - Core Data Convenience.
-
-    var sharedContext: NSManagedObjectContext {
-        return CoreDataStackManager.sharedInstance().managedObjectContext
-    }
-
-    lazy var fetchedResultsController: NSFetchedResultsController = {
-        
-        let fetchRequest = NSFetchRequest(entityName: "Pin")
-        
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "latitude", ascending: true)]
-        
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-            managedObjectContext: self.sharedContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        
-        fetchedResultsController.delegate = self
-        return fetchedResultsController
-        
-        }()
-    
+    // adds a pin to the context and searches for images based on the longitude and latitude
     func addPin(sender: UIGestureRecognizer) {
         let point = sender.locationInView(mapView)
         let coordinates = mapView.convertPoint(point, toCoordinateFromView: mapView)
@@ -73,39 +67,17 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
             
             let newPin = Pin(dictionary: dictionary, context: sharedContext)
             CoreDataStackManager.sharedInstance().saveContext()
-            FlickrClient.sharedInstance().searchImagesByLatLon(newPin)
+            FlickrClient.sharedInstance().searchImagesByLatLon(newPin, pageNum: "1")
         }
         
     }
     
-    func restoreMap() {
-        if let savedMap = NSUserDefaults.standardUserDefaults().objectForKey("mapData") as? [String: AnyObject] {
-            let region = MKCoordinateRegion(
-                center: CLLocationCoordinate2DMake(savedMap["latitude"] as! CLLocationDegrees,
-                                                   savedMap["longitude"] as! CLLocationDegrees),
-                // multiplying by this constant allows the span to stop growing larger and larger with each run
-                span: MKCoordinateSpanMake((savedMap["latDelta"] as! CLLocationDegrees) * 0.882,
-                                           (savedMap["longDelta"] as! CLLocationDegrees) * 0.882)
-            )
-            mapView.setRegion(region, animated: false)
-        }
-    }
-
-    func saveMap() {
-        let map: [String: AnyObject] = [
-            "latitude": mapView.region.center.latitude,
-            "longitude": mapView.region.center.longitude,
-            "latDelta": mapView.region.span.latitudeDelta,
-            "longDelta": mapView.region.span.longitudeDelta
-        ]
-        NSUserDefaults.standardUserDefaults().setObject(map, forKey: "mapData")
-    }
-    
+    // Toggles between editMode
     @IBAction func beginEditMode(sender: AnyObject) {
         if editMode {
             editMode = false
             editButton.title = "Edit"
-            // remove "Tap pins to delete"
+            // lowers "Tap pins to delete"
             view.frame.origin.y += 50
             // reenable gesture recognizer
             enableGesture()
@@ -114,8 +86,9 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
           // if we touch Edit
             editMode = true
             editButton.title = "Done"
-            // raise "Tap pins to delete"
+            // raises "Tap pins to delete"
             view.frame.origin.y -= 50
+            // disable gesture so that you can't add pins in edit mode
             disableGesture()
         }
         
@@ -134,8 +107,41 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
                 }
             }
         }
-        
     }
+    
+    // Saves map values
+    func saveMap() {
+        let map: [String: AnyObject] = [
+            "latitude": mapView.region.center.latitude,
+            "longitude": mapView.region.center.longitude,
+            "latDelta": mapView.region.span.latitudeDelta,
+            "longDelta": mapView.region.span.longitudeDelta
+        ]
+        NSUserDefaults.standardUserDefaults().setObject(map, forKey: "mapData")
+    }
+    
+    // MARK: - Shared Context
+    var sharedContext: NSManagedObjectContext {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }
+    
+    // Mark: - Fetched Results Controller
+    
+    lazy var fetchedResultsController: NSFetchedResultsController = {
+        
+        let fetchRequest = NSFetchRequest(entityName: "Pin")
+        
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "latitude", ascending: true)]
+        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
+            managedObjectContext: self.sharedContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil)
+        
+        fetchedResultsController.delegate = self
+        return fetchedResultsController
+        
+    }()
     
     // MARK: - Fetched Results Controller Delegate - Need to have this or else NSFetchedResultsController won't update
   
@@ -144,11 +150,9 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         switch type{
             
         case .Insert:
-            print("Insert an item")
             mapView.addAnnotation(anObject as! Pin)
             break
         case .Delete:
-            print("Delete an item")
             mapView.removeAnnotation(anObject as! Pin)
             break
         default:
@@ -156,15 +160,14 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
         }
     }
     
-    
-    // MARK: mapView
+    // MARK: mapView Delegate
     
     func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         saveMap()
     }
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
-        // if we are in edit mode when touching a pin
+        // if in edit mode on touching a pin, delete it
         if editMode {
             let touchedPin = view.annotation as! Pin
             let pinArray = fetchedResultsController.fetchedObjects as! [Pin]
@@ -188,5 +191,4 @@ class TravelLocationMapViewController: UIViewController, MKMapViewDelegate, NSFe
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
-    
 }

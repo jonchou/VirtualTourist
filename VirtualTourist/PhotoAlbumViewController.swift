@@ -20,7 +20,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     private let reuseIdentifier = "FlickrCell"
     private var downloadCounter = 0
 
-    
     var selectedIndexes = [NSIndexPath]()
     
     // Keep the changes. We will keep track of insertions, deletions, and updates.
@@ -28,11 +27,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     var deletedIndexPaths: [NSIndexPath]!
     var updatedIndexPaths: [NSIndexPath]!
     
-    
     var pin: Pin!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         initializeMapView()
         initializePin()
         
@@ -48,6 +47,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             print("Error performing initial fetch: \(error)")
         }
 
+        // shows error label when no images are found
         if fetchedResultsController.fetchedObjects!.count == 0 {
             errorLabel.hidden = false
         } else {
@@ -72,14 +72,8 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         let region = MKCoordinateRegion(center: pin.coordinate, span: span)
         mapView.setRegion(region, animated: false)
     }
-    
-    var sharedContext: NSManagedObjectContext {
-        return CoreDataStackManager.sharedInstance().managedObjectContext
-    }
-    
-    
+
     // Layout the collection view
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -90,7 +84,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         
-        let width = floor(self.collectionView.frame.size.width/3)
+        let width = floor(collectionView.frame.size.width/3)
         layout.itemSize = CGSize(width: width, height: width)
         collectionView.collectionViewLayout = layout
     }
@@ -101,17 +95,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         
-        
-        // if the photo has been saved already
+        // if the photo has been saved already, assign image from memory
         if let myImage = photo.image {
             cell.FlickrCellImage.image = myImage
             cell.activityIndicator.hidden = true
             cell.activityIndicator.stopAnimating()
-            //print("photo found on hard drive")
         } else {
-            
-            // need to download the image
-            //print("downloading image")
+            // download the image
             cell.FlickrCellImage.image = UIImage(named: "placeholder")
 
             bottomButton.enabled = false
@@ -128,27 +118,24 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                         
                         // stores photo into image cache
                         photo.image = image
-                        
                         cell.FlickrCellImage.image = image
                         cell.activityIndicator.hidden = true
                         cell.activityIndicator.stopAnimating()
+                        
+                        // used to determine when to enable the bottom button
                         self.downloadCounter -= 1
                         if self.downloadCounter == 0 {
                             self.bottomButton.enabled = true
                         }
                     }
                 } else {
-                    // connection error
+                    print(error)
                 }
             }
             cell.taskToCancelifCellIsReused = task
         }
         
-        
-        
-        // If the cell is "selected" it's color panel is grayed out
-        // we use the Swift `find` function to see if the indexPath is in the array
-        
+        // if the cell is "selected," it's color panel is grayed out
         if let _ = selectedIndexes.indexOf(indexPath) {
             cell.FlickrCellImage.alpha = 0.5
         } else {
@@ -156,8 +143,7 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         }
     }
   
-    // Mark - UI Collection View
-    
+    // Mark - UI Collection View Delegate
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return self.fetchedResultsController.sections?.count ?? 0
@@ -165,7 +151,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = self.fetchedResultsController.sections![section]
-        
         return sectionInfo.numberOfObjects
     }
     
@@ -197,8 +182,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
         updateBottomButton()
     }
     
+    // MARK: - Shared Context
+    var sharedContext: NSManagedObjectContext {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }
     
-    // MARK: NSFetchedResultsController
+    
+    // MARK: Fetched Results Controller
     lazy var fetchedResultsController: NSFetchedResultsController = {
         
         let fetchRequest = NSFetchRequest(entityName: "Photo")
@@ -213,62 +203,34 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
     
     
     // MARK: - Fetched Results Controller Delegate
-    
-    // Whenever changes are made to Core Data the following three methods are invoked. This first method is used to create
-    // three fresh arrays to record the index paths that will be changed.
+
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
         // We are about to handle some new changes. Start out with empty arrays for each change type
         insertedIndexPaths = [NSIndexPath]()
         deletedIndexPaths = [NSIndexPath]()
         updatedIndexPaths = [NSIndexPath]()
-        
-        print("in controllerWillChangeContent")
     }
-    
-    // The second method may be called multiple times, once for each Photo object that is added, deleted, or changed.
-    // We store the index paths into the three arrays.
+
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         
         switch type{
             
         case .Insert:
-            print("Insert an item")
-            // Here we are noting that a new Photo instance has been added to Core Data. We remember its index path
-            // so that we can add a cell in "controllerDidChangeContent". Note that the "newIndexPath" parameter has
-            // the index path that we want in this case
             insertedIndexPaths.append(newIndexPath!)
             break
         case .Delete:
-            print("Delete an item")
-            // Here we are noting that a Photo instance has been deleted from Core Data. We keep remember its index path
-            // so that we can remove the corresponding cell in "controllerDidChangeContent". The "indexPath" parameter has
-            // value that we want in this case.
             deletedIndexPaths.append(indexPath!)
             break
         case .Update:
-            print("Update an item.")
-            // We don't expect Photo instances to change after they are created. But Core Data would
-            // notify us of changes if any occured. This can be useful if you want to respond to changes
-            // that come about after data is downloaded. For example, when an image is downloaded from
-            // Flickr in the Virtual Tourist app
             updatedIndexPaths.append(indexPath!)
             break
         case .Move:
-            print("Move an item. We don't expect to see this in this app.")
             break
         }
     }
     
-    // This method is invoked after all of the changes in the current batch have been collected
-    // into the three index path arrays (insert, delete, and update). We now need to loop through the
-    // arrays and perform the changes.
-    //
-    // The most interesting thing about the method is the collection view's "performBatchUpdates" method.
-    // Notice that all of the changes are performed inside a closure that is handed to the collection view.
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        
-        print("in controllerDidChangeContent. changes.count: \(insertedIndexPaths.count + deletedIndexPaths.count)")
-        
+
         collectionView.performBatchUpdates({() -> Void in
             
             for indexPath in self.insertedIndexPaths {
@@ -283,15 +245,16 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
                 self.collectionView.reloadItemsAtIndexPaths([indexPath])
             }
             
-            }, completion: nil)
+        }, completion: nil)
     }
     
     @IBAction func bottomButtonClicked(sender: AnyObject) {
+        // New collection
         if selectedIndexes.isEmpty {
-            // New collection
             deleteAllImages()
-            // Find new collection after
-            FlickrClient.sharedInstance().searchImagesByLatLon(pin)
+            // Find new collection after, flickr max page number is 40
+            let randomPage = String(arc4random_uniform(UInt32(pin.maxPages % 40)) + 1)
+            FlickrClient.sharedInstance().searchImagesByLatLon(pin, pageNum: randomPage)
         } else {
             // Delete Selected Images
             deleteSelectedImages()
@@ -331,7 +294,6 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDelegate, UICo
             try NSFileManager.defaultManager().removeItemAtPath(path)
         } catch _ {}
     }
-    
     
     func updateBottomButton() {
         if selectedIndexes.count > 0 {

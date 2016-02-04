@@ -12,15 +12,14 @@ import CoreData
 
 class FlickrClient {
     
-    private var pageNum = 1
     var session: NSURLSession
     
     init() {
         session = NSURLSession.sharedSession()
     }
 
-
-    func searchImagesByLatLon(pin: Pin)
+    // searches for photos by Pin location and initializes photo instances into the context
+    func searchImagesByLatLon(pin: Pin, pageNum: String)
     {
         let methodArguments = [
             "api_key": Constants.API_KEY,
@@ -31,19 +30,15 @@ class FlickrClient {
             "safe_search": Constants.SAFE_SEARCH,
             "per_page": Constants.PER_PAGE,
             "bbox": createBBox(pin),
-            "page": String(pageNum)
+            "page": pageNum
         ]
         
-        // Get the shared NSURLSession to facilitate network activity
-        //let session = NSURLSession.sharedSession()
-        
-        // Create NSURLRequest using properly escaped URL
+        // create NSURLRequest using properly escaped URL
         let urlString = Constants.BASE_URL + escapedParameters(methodArguments)
         let url = NSURL(string: urlString)!
         let request = NSURLRequest(URL: url)
         
-        
-        /* 4 - Initialize task for getting data */
+        // Initialize task for getting data
         let task = session.dataTaskWithRequest(request) { (data, response, downloadError) in
             if let error = downloadError {
                 print("Could not complete the request \(error)")
@@ -54,13 +49,10 @@ class FlickrClient {
                         
                         if let photosDictionary = parsedResult["photos"] as? NSDictionary
                         {
-                            // gets the next page for next use
-                            if let maxPageNum = photosDictionary["pages"] as? Int {
-                                if maxPageNum > self.pageNum {
-                                    self.pageNum++
-                                } else if maxPageNum == self.pageNum {
-                                    // go back to the beginning of photos
-                                    self.pageNum = 1
+                            // assigns max page number on first task call
+                            if pin.maxPages == 0 {
+                                if let maxPageNum = photosDictionary["pages"] as? Int {
+                                    pin.maxPages = maxPageNum
                                 }
                             }
                             var totalPhotosVal = 0
@@ -76,28 +68,20 @@ class FlickrClient {
                                 }
                             }
                         }
-                        //print(parsedResult)
                     }
                 } catch {
                     print(parsingError)
                 }
-                
-                
             }
         }
-        
         task.resume()
-        
     }
     
+    // downloads the image
     func taskForImage(filePath: String, completionHandler: (imageData: NSData?, error: NSError?) ->  Void) -> NSURLSessionTask {
         
         let url = NSURL(string: filePath)!
-        
-//        print(url)
-        
         let request = NSURLRequest(URL: url)
-        
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in
             
             if let error = downloadError {
@@ -107,9 +91,7 @@ class FlickrClient {
                 completionHandler(imageData: data, error: nil)
             }
         }
-        
         task.resume()
-        
         return task
     }
     
@@ -120,7 +102,6 @@ class FlickrClient {
         let maxLat = (pin.latitude).doubleValue + 0.5
         return "\(minLon), \(minLat), \(maxLon), \(maxLat)"
     }
-    
     
     class func errorForData(data: NSData?, response: NSURLResponse?, error: NSError) -> NSError {
         
@@ -135,7 +116,6 @@ class FlickrClient {
                 let userInfo = [NSLocalizedDescriptionKey : errorMessage]
                 return NSError(domain: "Flickr Error", code: 1, userInfo: userInfo)
             }
-            
         } catch _ {}
         
         return error
@@ -158,7 +138,6 @@ class FlickrClient {
             urlVars += [key + "=" + "\(escapedValue!)"]
             
         }
-        
         return (!urlVars.isEmpty ? "?" : "") + urlVars.joinWithSeparator("&")
     }
     
@@ -175,6 +154,7 @@ class FlickrClient {
         static let imageCache = ImageCache()
     }
     
+    // MARK: - Shared Context
     lazy var sharedContext: NSManagedObjectContext = {
         return CoreDataStackManager.sharedInstance().managedObjectContext
     }()

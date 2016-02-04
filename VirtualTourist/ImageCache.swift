@@ -25,13 +25,11 @@ class ImageCache {
         
         // First try the memory cache
         if let image = inMemoryCache.objectForKey(path) as? UIImage {
-            //print("it is in memory cache")
             return image
         }
         
         // Next Try the hard drive
         if let data = NSData(contentsOfFile: path) {
-            //print("it is in hard drive")
             return UIImage(data: data)
         }
         

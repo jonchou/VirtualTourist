@@ -11,19 +11,17 @@ import UIKit
 
 
 class Photo: NSManagedObject {
+    
     struct Keys {
         static let ID = "id"
         static let imageURL = "url_m"
-       // static let ReleaseDate = "release_date"
     }
-    
     
     @NSManaged var id: String?
     @NSManaged var imagePath: String?
-    @NSManaged var pin: Pin
     @NSManaged var imageUrl: String?
+    @NSManaged var pin: Pin
 
-    
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
@@ -44,12 +42,10 @@ class Photo: NSManagedObject {
     var image: UIImage? {
         
         get {
-            //print("checking imagecache")
             return FlickrClient.Caches.imageCache.imageWithIdentifier(imagePath)
         }
         
         set {
-            //print("photo being saved to imagecache")
             FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: imagePath!)
         }
     }

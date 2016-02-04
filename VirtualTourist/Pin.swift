@@ -9,8 +9,6 @@
 import CoreData
 import MapKit
 
-//@objc(Pin)
-
 class Pin: NSManagedObject, MKAnnotation {
     
     struct Keys {
@@ -20,6 +18,7 @@ class Pin: NSManagedObject, MKAnnotation {
     
     @NSManaged var latitude: NSNumber
     @NSManaged var longitude: NSNumber
+    @NSManaged var maxPages: Int
     @NSManaged var photos: [Photo]
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
