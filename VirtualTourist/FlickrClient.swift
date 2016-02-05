@@ -50,21 +50,26 @@ class FlickrClient {
                         if let photosDictionary = parsedResult["photos"] as? NSDictionary
                         {
                             // assigns max page number on first task call
-                            if pin.maxPages == 0 {
-                                if let maxPageNum = photosDictionary["pages"] as? Int {
-                                    pin.maxPages = maxPageNum
+                            dispatch_async(dispatch_get_main_queue()) {
+                                if pin.maxPages == 0 {
+                                    if let maxPageNum = photosDictionary["pages"] as? Int {
+                                        pin.maxPages = maxPageNum
+                                    }
                                 }
                             }
+                            
                             var totalPhotosVal = 0
                             if let totalPhotos = photosDictionary["total"] as? String {
                                 totalPhotosVal = (totalPhotos as NSString).integerValue
                             }
                             if totalPhotosVal > 0 {
                                 if let photoArray = photosDictionary["photo"] as? [[String: AnyObject]] {
+                                    dispatch_async(dispatch_get_main_queue()) {
                                     for photo in photoArray {
                                         _ = Photo(dictionary: photo, pin: pin, context: self.sharedContext)
                                     }
                                     CoreDataStackManager.sharedInstance().saveContext()
+                                    }
                                 }
                             }
                         }

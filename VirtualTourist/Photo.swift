@@ -49,4 +49,8 @@ class Photo: NSManagedObject {
             FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: imagePath!)
         }
     }
+    
+    override func prepareForDeletion() {
+        FlickrClient.Caches.imageCache.storeImage(nil, withIdentifier: imagePath!)
+    }
 }
